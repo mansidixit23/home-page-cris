@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IREPS Responsive UI</title>
+  <style>
+    /* Reset & base */
+    *{box-sizing:border-box}
+    :root{
+      --primary:#1e56a0;
+      --accent:#ff6f4a;
+      --muted:#f5f7fa;
+      --card-bg:#fff;
+      --text:#222;
+      --radius:12px;
+      --max-width:1180px;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;font-family:Inter, 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', Arial;
+      background:var(--muted);color:var(--text);transition:background .25s,color .25s;font-size:16px;
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+    }
+    body.dark{background:#0f1720;color:#e6eef8}
+    img,svg{vertical-align:middle}
+
+    /* Layout helpers */
+    .app-shell{max-width:var(--max-width);margin:0 auto;display:grid;grid-template-columns:1fr;gap:1rem;padding:0 1rem 6rem}
+
+    /* Header */
+    header{position:sticky;top:0;background:var(--primary);color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:1rem;z-index:120;box-shadow:0 4px 18px rgba(0,0,0,.12);border-bottom:4px solid rgba(255,255,255,.04)}
+    .menu-btn{background:transparent;border:0;color:inherit;font-size:1.5rem;cursor:pointer;padding:.25rem .4rem}
+    .app-title{font-weight:700;font-size:1.15rem;letter-spacing:.2px}
+    .header-right{display:flex;align-items:center;gap:.75rem;margin-left:auto}
+    .accessibility-btn{background:transparent;border:0;color:inherit;font-size:1.2rem;cursor:pointer}
+
+    /* Drawer (mobile menu) */
+    .drawer{position:fixed;inset:0;pointer-events:none}
+    .drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;transition:opacity .2s;pointer-events:none}
+    .drawer-panel{position:fixed;top:0;left:0;height:100%;width:min(320px,85%);background:var(--card-bg);transform:translateX(-110%);box-shadow:8px 0 40px rgba(0,0,0,.25);transition:transform .25s;pointer-events:auto;border-radius:0 12px 12px 0;padding:1rem}
+    body.dark .drawer-panel{background:#0b1220;color:#dbe9ff}
+    .drawer.open .drawer-backdrop{opacity:1;pointer-events:auto}
+    .drawer.open .drawer-panel{transform:none}
+
+    /* Topbar search */
+    .search-bar{display:flex;align-items:center;gap:.5rem;max-width:620px;margin:0 auto}
+    .search-bar input{flex:1;padding:.6rem .9rem;border:2px solid rgba(30,86,160,.12);border-radius:8px;font-size:1rem}
+    .search-bar button{padding:.55rem .8rem;background:var(--primary);border:0;color:#fff;border-radius:8px;cursor:pointer}
+
+    /* Grid */
+    .card-grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+    .card{background:var(--card-bg);border-radius:var(--radius);padding:1rem;box-shadow:0 8px 20px rgba(25,40,60,.06);display:flex;flex-direction:column;align-items:center;text-align:center;cursor:pointer;transition:transform .18s,box-shadow .18s}
+    body.dark .card{background:#12161b;box-shadow:0 8px 18px rgba(255,255,255,.02)}
+    .card:focus{outline:3px solid rgba(30,86,160,.12)}
+    .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(25,40,60,.12)}
+    .card-icon{font-size:1.7rem;margin-bottom:.6rem;padding:.45rem;border-radius:10px;width:56px;height:56px;display:flex;align-items:center;justify-content:center}
+    .card-label{font-weight:600;font-size:.95rem;color:var(--text)}
+    body.dark .card-label{color:#d1e6ff}
+
+    /* colors for icons */
+    .custom-search{background:#eef2ff;color:#362bc3}
+    .closing-today{background:#e9f6ea;color:#1f6b2f}
+    .tender-status{background:#fff6e6;color:#9d6b00}
+
+    /* action buttons */
+    .quick-actions{display:flex;gap:1rem;justify-content:center;margin-top:1rem}
+    .quick-action-btn{flex:1;max-width:180px;background:var(--accent);color:#fff;border:0;padding:.8rem 1rem;border-radius:10px;font-weight:700;cursor:pointer;box-shadow:0 6px 16px rgba(255,111,74,.28)}
+
+    /* Section headings */
+    h2.section-title{color:var(--primary);font-weight:800;border-left:6px solid var(--primary);padding-left:.6rem;margin:.6rem 0}
+
+    /* Bottom Nav (mobile) */
+    nav.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card-bg);border-top:1px solid rgba(0,0,0,.06);display:flex;justify-content:space-around;align-items:center;height:62px;z-index:110;box-shadow:0 -8px 24px rgba(0,0,0,.06)}
+    body.dark nav.bottom-nav{background:#071025;border-top-color:rgba(255,255,255,.04)}
+    nav.bottom-nav button{background:transparent;border:0;color:#444;font-size:.92rem;display:flex;flex-direction:column;align-items:center;gap:4px;padding:.35rem .3rem}
+    nav.bottom-nav button.active{color:var(--primary);font-weight:700}
+
+    /* Layout for larger screens */
+    @media (min-width:900px){
+      .app-shell{grid-template-columns:250px 1fr;gap:1.5rem;padding-left:1.5rem;padding-right:1.5rem}
+      /* Sidebar */
+      .sidebar{display:flex;flex-direction:column;gap:1rem;padding:1rem 0}
+      .main-area{padding:1rem 0}
+      /* Hide bottom nav on desktop */
+      nav.bottom-nav{display:none}
+      /* Wider search */
+      .search-bar{max-width:900px}
+    }
+
+    @media (min-width:1200px){
+      :root{--max-width:1400px}
+      .card-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+    }
+
+    /* Mobile adjustments */
+    @media (max-width:599px){
+      .card-grid{grid-template-columns:repeat(2,1fr);gap:.6rem}
+      header{padding:.6rem .6rem}
+      .app-title{font-size:1rem}
+      .search-bar{margin:0 .3rem}
+      .quick-actions{flex-direction:row;padding:0 .6rem}
+    }
+
+    /* Utility */
+    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+
+  </style>
+</head>
+<body>
+  <header>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+    <div class="app-title">IREPS</div>
+
+    <div style="flex:1;display:flex;justify-content:center;">
+      <div class="search-bar" role="search">
+        <input id="searchInput" type="search" placeholder="Search features..." aria-label="Search features" />
+        <button aria-label="Search Button">🔍</button>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <label class="dark-mode-toggle" title="Toggle dark mode">
+        <input id="darkModeToggle" type="checkbox" aria-hidden="true" style="display:none;" />
+        <span style="display:inline-block;border-radius:24px;border:2px solid rgba(255,255,255,.15);padding:.2rem .45rem;font-size:.9rem;cursor:pointer">🌓</span>
+      </label>
+      <button class="accessibility-btn" aria-label="Accessibility Options" title="Accessibility">⚙️</button>
+    </div>
+  </header>
+
+  <!-- Drawer for mobile menu -->
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-backdrop" id="drawerBackdrop" tabindex="-1"></div>
+    <aside class="drawer-panel" role="dialog" aria-label="Main menu" aria-modal="true">
+      <button id="closeDrawer" aria-label="Close menu" style="background:transparent;border:0;font-size:1.1rem;align-self:flex-end;cursor:pointer">✕</button>
+      <nav aria-label="Primary" style="display:flex;flex-direction:column;gap:.6rem;margin-top:.4rem">
+        <a href="#" style="padding:.6rem .5rem;border-radius:8px;text-decoration:none;color:inherit">Home</a>
+        <a href="#" style="padding:.6rem .5rem;border-radius:8px;text-decoration:none;color:inherit">E-Tender</a>
+        <a href="#" style="padding:.6rem .5rem;border-radius:8px;text-decoration:none;color:inherit">E-Auction</a>
+        <a href="#" style="padding:.6rem .5rem;border-radius:8px;text-decoration:none;color:inherit">Login</a>
+        <a href="#" style="padding:.6rem .5rem;border-radius:8px;text-decoration:none;color:inherit">Helpdesk</a>
+      </nav>
+    </aside>
+  </div>
+
+  <div class="app-shell">
+    <!-- Sidebar (only visible on wider screens) -->
+    <aside class="sidebar" aria-label="Sidebar" style="display:none">
+      <div style="font-weight:700;color:var(--primary)">Quick Links</div>
+      <button class="quick-action-btn" style="width:100%">UDM</button>
+      <button class="quick-action-btn" style="width:100%">CRIS</button>
+    </aside>
+
+    <main class="main-area" role="main">
+      <section aria-labelledby="etender-title">
+        <h2 class="section-title" id="etender-title">E-Tender</h2>
+        <div class="card-grid" id="etenderGrid">
+          <div class="card" tabindex="0"><div class="card-icon custom-search">🔎⚙️</div><div class="card-label">Custom Search</div></div>
+          <div class="card" tabindex="0"><div class="card-icon closing-today">📅✔️</div><div class="card-label">Closing Today</div></div>
+          <div class="card" tabindex="0"><div class="card-icon tender-status">📋⏰</div><div class="card-label">Tender Status</div></div>
+          <div class="card" tabindex="0"><div class="card-icon">📊</div><div class="card-label">High Value Tender</div></div>
+          <div class="card" tabindex="0"><div class="card-icon ra-live">📈</div><div class="card-label">RA-Live & Upcoming</div></div>
+          <div class="card" tabindex="0"><div class="card-icon ra-closed">🔒⏰</div><div class="card-label">RA Closed</div></div>
+          <div class="card" tabindex="0"><div class="card-icon search-po">🔍</div><div class="card-label">Search PO</div></div>
+          <div class="card" tabindex="0"><div class="card-icon generate-otp">🔐 OTP</div><div class="card-label">Generate OTP</div></div>
+        </div>
+      </section>
+
+      <hr style="margin:1.6rem 0;border:none;border-top:1px solid rgba(0,0,0,.06)" />
+
+      <section aria-labelledby="eauction-title">
+        <h2 class="section-title" id="eauction-title">E-Auction (Leasing & Sale)</h2>
+        <div class="card-grid" id="auctionGrid">
+          <div class="card" tabindex="0"><div class="card-icon parcel-payment">💳</div><div class="card-label">Parcel Payment</div></div>
+          <div class="card" tabindex="0"><div class="card-icon live-auction">📡</div><div class="card-label">Live Auction</div></div>
+          <div class="card" tabindex="0"><div class="card-icon upcoming-auction">🔔</div><div class="card-label">Upcoming Auction</div></div>
+          <div class="card" tabindex="0"><div class="card-icon published-auction">👁️</div><div class="card-label">Published Auction</div></div>
+          <div class="card" tabindex="0"><div class="card-icon schedule-auction">📆</div><div class="card-label">Schedule Auction</div></div>
+          <div class="card" tabindex="0"><div class="card-icon lot-search">☑️</div><div class="card-label">Lot Search</div></div>
+          <div class="card" tabindex="0"><div class="card-icon e-sale-condition">🗂️</div><div class="card-label">E-Sale Condition</div></div>
+          <div class="card" tabindex="0"><div class="card-icon auctioning-units">⚙️</div><div class="card-label">Auctioning Units</div></div>
+        </div>
+      </section>
+
+      <div class="quick-actions" role="region" aria-label="Quick Access Buttons">
+        <button class="quick-action-btn">UDM</button>
+        <button class="quick-action-btn">CRIS</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Bottom nav (mobile only) -->
+  <nav class="bottom-nav" role="navigation" aria-label="Bottom Navigation">
+    <button class="active" aria-current="page" aria-label="Home">🏠<span style="font-size:.72rem">Home</span></button>
+    <button aria-label="Login">🔐<span style="font-size:.72rem">Login</span></button>
+    <button aria-label="Helpdesk">🎧<span style="font-size:.72rem">Help</span></button>
+    <button aria-label="Links">🔗<span style="font-size:.72rem">Links</span></button>
+  </nav>
+
+  <script>
+    // Elements
+    const drawer = document.getElementById('drawer');
+    const menuBtn = document.getElementById('menuBtn');
+    const closeDrawer = document.getElementById('closeDrawer');
+    const drawerBackdrop = document.getElementById('drawerBackdrop');
+    const darkToggle = document.getElementById('darkModeToggle');
+    const searchInput = document.getElementById('searchInput');
+
+    // Drawer open/close handling (accessible)
+    function openDrawer(){drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';}
+    function closeDrawerFn(){drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');document.body.style.overflow='';menuBtn.focus();}
+    menuBtn.addEventListener('click', openDrawer);
+    closeDrawer.addEventListener('click', closeDrawerFn);
+    drawerBackdrop.addEventListener('click', closeDrawerFn);
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape' && drawer.classList.contains('open')) closeDrawerFn(); });
+
+    // Dark mode: persists to localStorage
+    (function(){
+      const saved = localStorage.getItem('ireps.dark') === 'true';
+      if(saved){document.body.classList.add('dark'); darkToggle.checked = true}
+    })();
+    // Since we used a faux control, toggle on click of the wrapper
+    document.querySelector('.dark-mode-toggle').addEventListener('click', ()=>{
+      const isDark = document.body.classList.toggle('dark');
+      localStorage.setItem('ireps.dark', isDark);
+    });
+
+    // Simple search that filters cards live
+    searchInput.addEventListener('input', ()=>{
+      const q = searchInput.value.trim().toLowerCase();
+      document.querySelectorAll('.card').forEach(card=>{
+        const label = card.querySelector('.card-label')?.textContent?.toLowerCase()||'';
+        card.style.display = label.includes(q) ? 'flex' : 'none';
+      });
+    });
+
+    // Show sidebar only on big screens (keeps it hidden in DOM style but toggles visible)
+    function handleResize(){
+      const sidebar = document.querySelector('.sidebar');
+      if(window.innerWidth >= 900){ sidebar.style.display = 'flex'; document.querySelector('nav.bottom-nav').style.display = 'none'; }
+      else{ sidebar.style.display = 'none'; document.querySelector('nav.bottom-nav').style.display = 'flex'; }
+    }
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    // keyboard accessibility: allow Enter key to activate a card
+    document.querySelectorAll('.card').forEach(card=>{
+      card.addEventListener('keydown', e=>{ if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); } });
+    });
+
+  </script>
+</body>
+</html>
